@@ -417,39 +417,39 @@ const glados = async () => {
         pointsSummary.push(`账号${accountNo}(${account.envName}): 查询失败`)
       }
 
-      // 5. 自动兑换
-      const autoExchange = String(process.env.AUTO_EXCHANGE || 'true').toLowerCase() !== 'false'
-       console.log(`[${autoExchange}]`)
-      const exchangeThreshold = Number(process.env.EXCHANGE_THRESHOLD || 500)
-      if (autoExchange && currentPoints != null && currentPoints >= exchangeThreshold) {
-        try {
-          console.log(`[${tag}] 积分 ${currentPoints} ≥ ${exchangeThreshold}，自动兑换 100 天...`)
-          const exRes = await fetch(`https://${domain}/api/user/exchange`, {
-            method: 'POST',
-            headers: { ...headers, 'content-type': 'application/json' },
-            body: JSON.stringify({ planType: 'plan500' }),
-          })
-          if (!exRes.ok) throw new Error(`兑换接口HTTP错误: ${exRes.status}`)
-          const ex = await exRes.json()
-          if (ex?.code !== 0) throw new Error(`${ex?.message || '兑换失败'} (code=${ex?.code})`)
-          const remain = Number(ex?.points) || 0
-          console.log(`[${tag}] ✅ 自动兑换成功，剩余积分: ${remain}`)
-          notice.push(
-            `【账号${accountNo}】自动兑换成功`,
-            `兑换结果: ${ex?.message || '消耗500积分兑换100天'}`,
-            `剩余积分: ${remain}`
-          )
-        } catch (exErr) {
-          console.error(`[${tag}] ⚠️ 自动兑换异常（不影响签到结果）: ${exErr.message}`)
-          notice.push(`【账号${accountNo}】自动兑换失败`, `错误: ${exErr.message}`)
-        }
-      } else if (autoExchange) {
-        console.log(
-          `[${tag}] 积分 ${currentPoints ?? '未知'} 未达到 ${exchangeThreshold}，本次不兑换`
-        )
-      } else {
-        console.log(`[${tag}] 自动兑换已关闭`)
-      }
+      // 5. 不自动兑换
+      // const autoExchange = String(process.env.AUTO_EXCHANGE || 'true').toLowerCase() !== 'false'
+      //  console.log(`[${autoExchange}]`)
+      // const exchangeThreshold = Number(process.env.EXCHANGE_THRESHOLD || 500)
+      // if (autoExchange && currentPoints != null && currentPoints >= exchangeThreshold) {
+      //   try {
+      //     console.log(`[${tag}] 积分 ${currentPoints} ≥ ${exchangeThreshold}，自动兑换 100 天...`)
+      //     const exRes = await fetch(`https://${domain}/api/user/exchange`, {
+      //       method: 'POST',
+      //       headers: { ...headers, 'content-type': 'application/json' },
+      //       body: JSON.stringify({ planType: 'plan500' }),
+      //     })
+      //     if (!exRes.ok) throw new Error(`兑换接口HTTP错误: ${exRes.status}`)
+      //     const ex = await exRes.json()
+      //     if (ex?.code !== 0) throw new Error(`${ex?.message || '兑换失败'} (code=${ex?.code})`)
+      //     const remain = Number(ex?.points) || 0
+      //     console.log(`[${tag}] ✅ 自动兑换成功，剩余积分: ${remain}`)
+      //     notice.push(
+      //       `【账号${accountNo}】自动兑换成功`,
+      //       `兑换结果: ${ex?.message || '消耗500积分兑换100天'}`,
+      //       `剩余积分: ${remain}`
+      //     )
+      //   } catch (exErr) {
+      //     console.error(`[${tag}] ⚠️ 自动兑换异常（不影响签到结果）: ${exErr.message}`)
+      //     notice.push(`【账号${accountNo}】自动兑换失败`, `错误: ${exErr.message}`)
+      //   }
+      // } else if (autoExchange) {
+      //   console.log(
+      //     `[${tag}] 积分 ${currentPoints ?? '未知'} 未达到 ${exchangeThreshold}，本次不兑换`
+      //   )
+      // } else {
+      //   console.log(`[${tag}] 自动兑换已关闭`)
+      // }
 
       console.log(`[${tag}] ✅ ${alreadyCheckedIn ? '今日已签到过' : '签到成功'}`)
       console.log(`[${tag}] 返回消息: ${action?.message || ''}`)
